@@ -12,7 +12,9 @@ const st = Object.fromEntries(USERS.map((u) => [u, { token: null, sid: null, ret
 let rr = 7; const rand = () => (rr = (rr * 48271) % 2147483647) / 2147483647;
 const pick = (a) => a[Math.floor(rand() * a.length)];
 let selected = null, packets = [], bursts = [], popFlash = {}, appFlash = {}, rtts = [], win = { allow: 0, deny: 0, challenge: 0 }, total = 0;
-const log = new LogView($("#log"), 200);
+const log = new LogView($("#log"), 200), _html = log.html.bind(log);
+const clockStr = () => new Date(simT * 1000).toISOString().slice(11, 19);
+log.html = (x) => _html(x, clockStr());
 
 // ---------- sessions + traffic ----------
 function login(u) {
