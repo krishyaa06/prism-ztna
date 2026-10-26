@@ -1,0 +1,34 @@
+<div class="sim">
+  <div class="main">
+    <div class="panel glow">
+      <div class="toolbar">
+        <button class="btn primary sm" data-play>▶ Run</button>
+        <select data-speed aria-label="Speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="3">3×</option></select>
+        <span class="sep"></span>
+        <button class="btn sm bad" id="pwn">Compromise riya's laptop</button>
+        <button class="btn sm bad" id="travel">mei logs in from KP</button>
+        <button class="btn sm bad" id="pop">Fail PoP bom</button>
+        <button class="btn sm" id="rotate">Rotate signing key</button>
+        <span class="sp"></span>
+        <span class="live"><i></i> paused</span>
+      </div>
+      <div id="kpis" style="margin-top:12px"></div>
+    </div>
+    <div class="viz" id="netw" style="height:470px"><span class="tag" id="clock">users → PoPs → private apps</span><canvas id="net"></canvas></div>
+    <div class="g2 grid">
+      <div class="panel"><div class="ph">Decisions / s</div><canvas class="chart" id="ch1" style="height:140px"></canvas></div>
+      <div class="panel"><div class="ph">Overlay RTT (ms)</div><canvas class="chart" id="ch2" style="height:140px"></canvas></div>
+    </div>
+  </div>
+  <div class="side">
+    <div class="panel"><div class="ph">Policy <span class="sp"></span><span class="pill dim" id="pver">—</span></div>
+      <textarea id="pol" rows="12" spellcheck="false" wrap="off"></textarea>
+      <div class="toolbar" style="margin-top:8px"><button class="btn primary sm" id="apply">Apply policy</button><button class="btn sm" id="revert">Reset</button><span class="sp"></span><span id="pstat" class="pstat"></span></div>
+    </div>
+    <div class="panel"><div class="ph">Decision inspector <span class="sp"></span><span class="pill dim" id="who">latest</span></div>
+      <div class="toolbar ask"><select id="qu" aria-label="User"></select><select id="qa" aria-label="App"></select><button class="btn sm" id="ask">Evaluate</button></div>
+      <div id="insp" class="log" style="height:210px;margin-top:8px;font-size:11px"></div>
+    </div>
+    <div class="panel"><div class="ph">Audit log</div><div id="log" class="log" style="height:200px;font-size:11px"></div></div>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+{
+  "name": "prism-ztna",
+  "version": "1.0.0",
+  "description": "Prism ZTNA replaces the VPN with per-request decisions. A small policy language (apps, allow/deny rules, attribute conditions, step-up MFA) is parsed by a Pratt parser and evaluated with deny-overrides and default deny, and every decision explains itself rule by rule. Device posture is scored from disk encryption, EDR, patch age, jailbreak and MDM signals. Sessions use device-bound HS256 tokens with key rotation, posture is re-checked on every request, and traffic is routed through an anycast PoP mesh to outbound-only app connectors. It ships with a hash-chained audit log, a policy linter, an identity-aware HTTP reverse proxy and a CLI.",
+  "type": "module",
+  "bin": {
+    "ztna": "bin/ztna.js"
+  },
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "start": "npx --yes serve ."
+  },
+  "keywords": [
+    "zero-trust",
+    "ztna",
+    "access-control",
+    "abac",
+    "policy-engine",
+    "identity-aware-proxy",
+    "device-posture",
+    "jwt",
+    "security",
+    "javascript"
+  ],
+  "author": "Soumya Bhandare (krishyaa06)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krishyaa06/prism-ztna.git"
+  },
+  "homepage": "https://krishyaa06.github.io/prism-ztna/",
+  "engines": {
+    "node": ">=18.17"
+  }
+}

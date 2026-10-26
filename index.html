@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prism ZTNA · Identity- and device-aware access proxy with a policy language · Prism Systems</title>
+  <meta name="description" content="Prism ZTNA replaces the VPN with per-request decisions. A small policy language (apps, allow/deny rules, attribute conditions, step-up MFA) is parsed by a Pratt parser and evaluated with deny-overrides and default deny, and every decision explains itself rule by rule. Device posture is scored from disk encryption, EDR, patch age, jailbreak and MDM signals. Sessions use device-bound HS256 tokens with key rotation, posture is re-checked on every request, and traffic is routed through an anycast PoP mesh to outbound-only app connectors. It ships with a hash-chained audit log, a policy linter, an identity-aware HTTP reverse proxy and a CLI." />
+  <meta name="theme-color" content="#06070d" />
+  <meta property="og:title" content="Prism ZTNA · Prism Systems" />
+  <meta property="og:description" content="Prism ZTNA replaces the VPN with per-request decisions. A small policy language (apps, allow/deny rules, attribute conditions, step-up MFA) is parsed by a Pratt parser and evaluated with deny-overrides and default deny, and every decision explains itself rule by rule. Device posture is scored from disk encryption, EDR, patch age, jailbreak and MDM signals. Sessions use device-bound HS256 tokens with key rotation, posture is re-checked on every request, and traffic is routed through an anycast PoP mesh to outbound-only app connectors. It ships with a hash-chained audit log, a policy linter, an identity-aware HTTP reverse proxy and a CLI." />
+  <meta property="og:image" content="https://krishyaa06.github.io/prism-ztna/assets/screenshots/desktop.png" />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/pro.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <style>:root{--accent:#34F5C5;--accent-2:#7C5CFF}</style>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <header class="topbar"><div class="wrap">
+    <a class="brand" href="./"><span class="mark">◆</span><b>PRISM</b><span>ZTNA</span></a>
+    <nav>
+      <a class="nl" href="#sim">Simulator</a><a class="nl" href="#features">Features</a><a class="nl" href="#how">How it works</a><a class="nl" href="#arch">Architecture</a><a class="nl" href="#use">Use it</a>
+      <a class="btn sm" href="https://github.com/krishyaa06/prism-ztna" target="_blank" rel="noreferrer">★ GitHub</a>
+    </nav>
+  </div></header>
+  <main>
+    <section class="hero wrap">
+      <p class="eyebrow"><span class="n">07 / 49</span>Prism Systems · Cloud-Native &amp; Developer Infrastructure</p>
+      <h1>Zero-trust access that <em>checks every request</em>, not just the login</h1>
+      <p class="lead">A zero-trust network access proxy: a readable policy language with deny-overrides, device posture scoring, device-bound HS256 session tokens with key rotation, step-up MFA, continuous verification that revokes sessions when posture drops, an anycast PoP mesh with outbound-only app connectors, and a hash-chained audit log.</p>
+      <div class="cta"><a class="btn primary" href="#sim">▶ Launch the simulator</a><a class="btn" href="#use">Use the engine</a><a class="btn ghost" href="https://github.com/krishyaa06/prism-ztna" target="_blank" rel="noreferrer">View source →</a></div>
+      <div class="chips"><span class="chip"><i></i>Zero dependencies</span><span class="chip"><i></i>Policy language + linter</span><span class="chip"><i></i>Device-bound tokens</span><span class="chip"><i></i>Continuous verification</span><span class="chip"><i></i>Tamper-evident audit</span></div>
+    </section>
+    <section class="section wrap" id="sim">
+      <div class="sec-head"><span class="kicker">Live simulator</span><h2>Six users, five PoPs, six private apps</h2><p>Every dot is a request decided at the nearest PoP. Compromise a laptop and watch its session get revoked, log in from a sanctioned country, kill a PoP to see traffic re-route, rotate keys, or edit the policy live and apply it.</p></div>
+<div class="sim">
+  <div class="main">
+    <div class="panel glow">
+      <div class="toolbar">
+        <button class="btn primary sm" data-play>▶ Run</button>
+        <select data-speed aria-label="Speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="3">3×</option></select>
+        <span class="sep"></span>
+        <button class="btn sm bad" id="pwn">Compromise riya's laptop</button>
+        <button class="btn sm bad" id="travel">mei logs in from KP</button>
+        <button class="btn sm bad" id="pop">Fail PoP bom</button>
+        <button class="btn sm" id="rotate">Rotate signing key</button>
+        <span class="sp"></span>
+        <span class="live"><i></i> paused</span>
+      </div>
+      <div id="kpis" style="margin-top:12px"></div>
+    </div>
+    <div class="viz" id="netw" style="height:470px"><span class="tag" id="clock">users → PoPs → private apps</span><canvas id="net"></canvas></div>
+    <div class="g2 grid">
+      <div class="panel"><div class="ph">Decisions / s</div><canvas class="chart" id="ch1" style="height:140px"></canvas></div>
+      <div class="panel"><div class="ph">Overlay RTT (ms)</div><canvas class="chart" id="ch2" style="height:140px"></canvas></div>
+    </div>
+  </div>
+  <div class="side">
+    <div class="panel"><div class="ph">Policy <span class="sp"></span><span class="pill dim" id="pver">—</span></div>
+      <textarea id="pol" rows="12" spellcheck="false" wrap="off"></textarea>
+      <div class="toolbar" style="margin-top:8px"><button class="btn primary sm" id="apply">Apply policy</button><button class="btn sm" id="revert">Reset</button><span class="sp"></span><span id="pstat" class="pstat"></span></div>
+    </div>
+    <div class="panel"><div class="ph">Decision inspector <span class="sp"></span><span class="pill dim" id="who">latest</span></div>
+      <div class="toolbar ask"><select id="qu" aria-label="User"></select><select id="qa" aria-label="App"></select><button class="btn sm" id="ask">Evaluate</button></div>
+      <div id="insp" class="log" style="height:210px;margin-top:8px;font-size:11px"></div>
+    </div>
+    <div class="panel"><div class="ph">Audit log</div><div id="log" class="log" style="height:200px;font-size:11px"></div></div>
+  </div>
+</div>
+
+    </section>
+    <section class="section wrap" id="features">
+      <div class="sec-head reveal"><span class="kicker">Features</span><h2>What's inside the engine</h2><p>Real algorithms, not mock-ups. The simulator above runs the exact same code you import.</p></div>
+      <div class="feat"><div class="card reveal"><div class="ic">⌘</div><h3>Policy language</h3><p>Declare apps with tags, then <code class="mono">allow</code> / <code class="mono">deny</code> rules with targets (<code class="mono">*</code>, names, <code class="mono">tag:prod</code>) and conditions using <code class="mono">and or not == != &lt; &gt;= in matches</code>, durations like <code class="mono">15m</code>, and <code class="mono">require mfa within 15m</code>.</p></div><div class="card reveal"><div class="ic">⚖</div><h3>Deny overrides, default deny</h3><p>All matching deny rules are checked first, then the first matching allow wins. Anything else is denied, with the failed conditions of every candidate rule in the reason.</p></div><div class="card reveal"><div class="ic">◉</div><h3>Explainable decisions</h3><p>The evaluator records each comparison with the value it saw, so every decision shows which rule fired and why (<code class="mono">device.score &gt;= 80 ← 77</code>).</p></div><div class="card reveal"><div class="ic">💻</div><h3>Device posture</h3><p>Weighted checks for disk encryption, EDR, patch age (with partial credit), jailbreak, firewall, screen lock and MDM produce a 0–100 score and a trusted / limited / untrusted tier.</p></div><div class="card reveal"><div class="ic">🔑</div><h3>Device-bound tokens</h3><p>HS256 tokens carry a <code class="mono">cnf.dev</code> thumbprint, audience and expiry, use constant-time signature checks and reject <code class="mono">alg: none</code>. Key rotation keeps the previous key for a grace period.</p></div><div class="card reveal"><div class="ic">↻</div><h3>Continuous verification</h3><p>Posture is re-evaluated on every request. If a device drops below the floor its sessions are revoked immediately, not at the next login.</p></div><div class="card reveal"><div class="ic">⬡</div><h3>PoP mesh</h3><p>Users anycast to the nearest healthy PoP, traffic crosses a private backbone (Dijkstra on RTT), and app connectors dial out to two PoPs, so private networks need no inbound ports.</p></div><div class="card reveal"><div class="ic">⛓</div><h3>Hash-chained audit</h3><p>Every login, decision, step-up and revocation commits to the previous entry with SHA-256. Editing any entry breaks the chain at that sequence number.</p></div></div>
+    </section>
+    <section class="section wrap" id="how">
+      <div class="sec-head reveal"><span class="kicker">How it works</span><h2>From request to result</h2></div>
+      <div class="steps"><div class="step reveal"><h3>Authenticate</h3><p>The IdP verifies the user. The broker scores the device and refuses login below the posture floor, then signs a token bound to that device.</p></div><div class="step reveal"><h3>Verify</h3><p>Each request presents the token and device id. Signature, audience, expiry, key id and device binding are checked, and the session must still exist.</p></div><div class="step reveal"><h3>Re-check posture</h3><p>Device signals are scored again. A compromised device loses its sessions on its next request.</p></div><div class="step reveal"><h3>Decide</h3><p>The policy sees user, device, geo, time and MFA age. Deny rules first, then allows, then default deny. Step-up rules return a challenge instead of an allow.</p></div><div class="step reveal"><h3>Route + audit</h3><p>Allowed traffic goes ingress PoP → backbone → egress PoP → connector → app with identity headers. Every outcome lands in the audit chain.</p></div></div>
+    </section>
+    <section class="section wrap" id="arch">
+      <div class="sec-head reveal"><span class="kicker">Architecture</span><h2>System design</h2><p>Every box is a module in src/. Data flows left to right.</p></div>
+      <div class="card arch reveal"><svg viewBox="0 0 1160 230" role="img" aria-label="Architecture diagram"><path class="e" d="M272,73 C290,73 290,73 308,73"/><path class="f" d="M272,73 C290,73 290,73 308,73"/><path class="e" d="M258,124 C288,124 288,102 258,102"/><path class="f" d="M258,124 C288,124 288,102 258,102"/><text class="el" x="288" y="113" text-anchor="middle">token</text><path class="e" d="M548,102 C578,102 578,124 548,124"/><path class="f" d="M548,102 C578,102 578,124 548,124"/><path class="e" d="M562,153 C580,153 580,73 598,73"/><path class="f" d="M562,153 C580,153 580,73 598,73"/><text class="el" x="580" y="107" text-anchor="middle">allow</text><path class="e" d="M562,153 C580,153 580,153 598,153"/><path class="f" d="M562,153 C580,153 580,153 598,153"/><path class="e" d="M852,73 C870,73 870,73 888,73"/><path class="f" d="M852,73 C870,73 870,73 888,73"/><path class="e" d="M1128,102 C1158,102 1158,124 1128,124"/><path class="f" d="M1128,102 C1158,102 1158,124 1128,124"/><text class="lane" x="145" y="24" text-anchor="middle">CLIENT</text><g class="node k0"><rect x="18" y="44" width="254" height="58" rx="12"/><text x="145" y="69" text-anchor="middle">User + device</text><text class="s" x="145" y="83" text-anchor="middle">token · posture signals</text></g><g class="node k0"><rect x="18" y="124" width="254" height="58" rx="12"/><text x="145" y="149" text-anchor="middle">IdP / MFA</text><text class="s" x="145" y="163" text-anchor="middle">login · step-up</text></g><text class="lane" x="435" y="24" text-anchor="middle">EDGE POP</text><g class="node kk2"><rect x="308" y="44" width="254" height="58" rx="12"/><text x="435" y="69" text-anchor="middle">Enforcement</text><text class="s" x="435" y="83" text-anchor="middle">verify · posture</text></g><g class="node kk2"><rect x="308" y="124" width="254" height="58" rx="12"/><text x="435" y="149" text-anchor="middle">Policy engine</text><text class="s" x="435" y="163" text-anchor="middle">deny-overrides</text></g><text class="lane" x="725" y="24" text-anchor="middle">MESH</text><g class="node kk3"><rect x="598" y="44" width="254" height="58" rx="12"/><text x="725" y="69" text-anchor="middle">Backbone</text><text class="s" x="725" y="83" text-anchor="middle">Dijkstra on RTT</text></g><g class="node kk3"><rect x="598" y="124" width="254" height="58" rx="12"/><text x="725" y="149" text-anchor="middle">Audit chain</text><text class="s" x="725" y="163" text-anchor="middle">sha-256 linked</text></g><text class="lane" x="1015" y="24" text-anchor="middle">PRIVATE APPS</text><g class="node k0"><rect x="888" y="44" width="254" height="58" rx="12"/><text x="1015" y="69" text-anchor="middle">Connector</text><text class="s" x="1015" y="83" text-anchor="middle">outbound tunnels</text></g><g class="node k0"><rect x="888" y="124" width="254" height="58" rx="12"/><text x="1015" y="149" text-anchor="middle">App</text><text class="s" x="1015" y="163" text-anchor="middle">identity headers</text></g></svg></div>
+    </section>
+    <section class="section wrap" id="use">
+      <div class="sec-head reveal"><span class="kicker">Use it</span><h2>Ship it in your own stack</h2><p>Zero dependencies. Works in Node.js 18+ and modern browsers.</p></div>
+      <div class="tabs" data-tabs="use"><button class="on">JavaScript API</button><button>CLI</button><button>Install</button></div>
+      <div class="tabp on" data-tabp="use"><div class="codebox"><div class="bar2"><i></i><i></i><i></i><span>example.js</span><button class="btn sm ghost copy" data-copy>Copy</button></div><pre><code><span class="tk-k">import</span> { Broker, Mesh, Policy, posture } <span class="tk-k">from</span> <span class="tk-s">&quot;prism-ztna&quot;</span>;
+
+<span class="tk-k">const</span> policy = <span class="tk-s">`
+app prod-db  host &quot;10.0.4.12:5432&quot;  tags [prod]
+deny  &quot;geo&quot;      *         when geo.country in [&quot;KP&quot;, &quot;IR&quot;]
+deny  &quot;posture&quot;  tag:prod  when device.tier != &quot;trusted&quot;
+allow &quot;sre&quot;      tag:prod  when &quot;sre&quot; in user.groups and device.score &gt;= 80 require mfa within 15m`</span>;
+
+<span class="tk-k">const</span> zt = <span class="tk-k">new</span> <span class="tk-f">Broker</span>({ policy, directory, mesh: <span class="tk-k">new</span> <span class="tk-f">Mesh</span>({ connectors }) });
+<span class="tk-k">const</span> { token, sid } = zt.<span class="tk-f">login</span>(<span class="tk-s">&quot;riya&quot;</span>, <span class="tk-s">&quot;mbp-riya&quot;</span>);          <span class="tk-c">// posture-checked, device-bound token</span>
+
+<span class="tk-k">const</span> d = zt.<span class="tk-f">access</span>(token, <span class="tk-s">&quot;prod-db&quot;</span>, { deviceId: <span class="tk-s">&quot;mbp-riya&quot;</span> });
+d.effect;   <span class="tk-c">// &quot;allow&quot; | &quot;deny&quot; | &quot;challenge&quot;</span>
+d.rule;     <span class="tk-c">// &quot;sre&quot;</span>
+d.trace;    <span class="tk-c">// every rule and comparison, with the values it saw</span>
+d.route;    <span class="tk-c">// { path: [&quot;bom&quot;], rtt: 1.1 }</span>
+
+zt.<span class="tk-f">stepUp</span>(sid);                       <span class="tk-c">// after WebAuthn / TOTP</span>
+zt.<span class="tk-f">revokeDevice</span>(<span class="tk-s">&quot;mbp-riya&quot;</span>, <span class="tk-s">&quot;lost&quot;</span>);  <span class="tk-c">// kill every session on a device</span>
+zt.<span class="tk-f">verifyAudit</span>();                     <span class="tk-c">// { ok: true, entries, head }</span>
+
+<span class="tk-k">new</span> <span class="tk-f">Policy</span>(policy).<span class="tk-f">lint</span>();            <span class="tk-c">// unknown targets, unreachable apps, unconditional rules</span></code></pre></div></div>
+      <div class="tabp" data-tabp="use"><div class="codebox"><div class="bar2"><i></i><i></i><i></i><span>terminal</span><button class="btn sm ghost copy" data-copy>Copy</button></div><pre><code><span class="tk-pr">$ </span>npx github:krishyaa06/prism-ztna demo
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-ztna lint examples/policy.ztna
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-ztna eval <span class="tk-p">--user</span> arjun <span class="tk-p">--app</span> prod-db
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-ztna posture
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-ztna route <span class="tk-p">--user</span> riya <span class="tk-p">--app</span> gitlab <span class="tk-p">--down</span> fra
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-ztna serve <span class="tk-p">--port</span> 8080</code></pre></div></div>
+      <div class="tabp" data-tabp="use"><div class="codebox"><div class="bar2"><i></i><i></i><i></i><span>terminal</span><button class="btn sm ghost copy" data-copy>Copy</button></div><pre><code><span class="tk-c"># use the CLI without installing</span>
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-ztna <span class="tk-p">--help</span>
+
+<span class="tk-c"># or add the engine to your project</span>
+<span class="tk-pr">$ </span>npm install github:krishyaa06/prism-ztna
+
+<span class="tk-c"># run the simulator locally</span>
+<span class="tk-pr">$ </span>git clone https://github.com/krishyaa06/prism-ztna.git &amp;&amp; cd prism-ztna
+<span class="tk-pr">$ </span>npx serve .   # then open http://localhost:3000</code></pre></div></div>
+    </section>
+  </main>
+  <footer class="foot"><div class="wrap">
+    <span>◆ Prism ZTNA · Prism Systems 07/49 · Built by <a href="https://github.com/krishyaa06">Soumya Bhandare</a> &amp; <a href="https://dc.gg/prismprotocol" target="_blank" rel="noreferrer">Prism Protocol</a></span>
+    <span><a href="https://github.com/krishyaa06/prism-ztna" target="_blank" rel="noreferrer">Source</a> · <a href="https://github.com/krishyaa06/prism-ztna/blob/main/docs/ARCHITECTURE.md">Architecture</a> · <a href="https://github.com/krishyaa06/prism-ztna/blob/main/docs/USAGE.md">Docs</a> · MIT License</span>
+  </div></footer>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

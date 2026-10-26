@@ -1,0 +1,14 @@
+# Prism ZTNA policy · deny overrides allow · default deny
+app grafana    host "grafana.internal:3000"   tags [observability]
+app gitlab     host "gitlab.internal:443"     tags [eng]
+app prod-db    host "10.0.4.12:5432"          tags [prod, data]
+app k8s-api    host "k8s.prod.internal:6443"  tags [prod]
+app payroll    host "payroll.internal:8443"   tags [finance]
+app wiki       host "wiki.internal:80"        tags [docs]
+
+deny  "sanctioned-geo"  *          when geo.country in ["KP", "IR", "SY", "CU"]
+deny  "untrusted-device" tag:prod  when device.tier != "trusted" or device.jailbroken
+allow "everyone-docs"   wiki       when user.type == "employee" or (user.type == "contractor" and time.hour >= 8 and time.hour < 20)
+allow "eng-tools"       gitlab, grafana  when "eng" in user.groups and device.managed
+allow "sre-prod"        tag:prod   when "sre" in user.groups and device.score >= 80 require mfa within 15m
+allow "finance-payroll" payroll    when user.dept == "finance" and device.os in ["macos", "windows"] and device.score >= 70 require mfa within 1h

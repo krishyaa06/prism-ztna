@@ -1,0 +1,12 @@
+#kpis{grid-template-columns:repeat(6,minmax(0,1fr))}
+@media(max-width:1200px){#kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:480px){#kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#netw{height:540px!important}}
+#net{cursor:pointer}
+#pol{width:100%;font:11px/1.55 var(--mono);white-space:pre;overflow:auto;tab-size:2;min-height:210px;resize:vertical}
+#pol.err{border-color:var(--bad)}
+.pstat{font:11px var(--mono);color:var(--muted);text-align:right;max-width:58%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pstat.bad{color:var(--bad)}.pstat.ok{color:var(--ok)}.pstat.warn{color:var(--warn)}
+.ask select{flex:1;min-width:0}
+#insp .rule{margin-top:6px;font-weight:600}#insp .leaf{padding-left:14px}
+#insp .hit{color:var(--accent)}#insp .miss{color:var(--faint)}

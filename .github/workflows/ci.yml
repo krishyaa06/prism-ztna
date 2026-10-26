@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+      - name: Smoke test
+        run: |
+          node bin/ztna.js lint examples/policy.ztna && node bin/ztna.js lint examples/lint-me.ztna && node bin/ztna.js eval --user arjun --app prod-db && node bin/ztna.js posture && node bin/ztna.js route --user riya --app gitlab --down fra && node bin/ztna.js token --user mei && node bin/ztna.js demo

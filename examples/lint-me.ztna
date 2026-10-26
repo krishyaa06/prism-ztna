@@ -1,0 +1,7 @@
+# a policy with problems for `ztna lint`
+app wiki   host "wiki.internal"   tags [docs]
+app vault  host "vault.internal"  tags [secrets]
+app crm    host "crm.internal"    tags [sales]
+allow "open-wiki"  wiki
+allow "typo"       wikki     when user.type == "employee"
+allow "secrets"    tag:secret when "sec" in user.groups
